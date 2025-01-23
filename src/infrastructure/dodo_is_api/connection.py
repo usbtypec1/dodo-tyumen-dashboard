@@ -112,3 +112,36 @@ class DodoIsApiConnection:
         if dismissed_to_date is not None:
             query_params["dismissedTo"] = f"{dismissed_to_date:%Y-%m-%d}"
         return self.http_client.get(url, params=query_params)
+
+    def get_staff_positions_history(
+        self,
+        *,
+        staff_member_ids: Iterable[UUID] | None = None,
+        unit_ids: Iterable[UUID] | None = None,
+        take: int | None = None,
+        skip: int | None = None,
+    ) -> httpx.Response:
+        if staff_member_ids is not None and unit_ids is not None:
+            raise ValueError(
+                "Invalid parameters. Both staff_member_ids and unit_ids specified"
+            )
+        if staff_member_ids is None and unit_ids is None:
+            raise ValueError(
+                "Invalid parameters. Either staff_member_ids or unit_ids must be specified"
+            )
+
+        url = "staff/positions/history"
+        query_params = {}
+
+        if staff_member_ids is not None:
+            query_params["staffMembers"] = join_uuids_with_comma(
+                staff_member_ids
+            )
+        if unit_ids is not None:
+            query_params["units"] = join_uuids_with_comma(unit_ids)
+        if take is not None:
+            query_params["take"] = take
+        if skip is not None:
+            query_params["skip"] = skip
+
+        return self.http_client.get(url, params=query_params)
