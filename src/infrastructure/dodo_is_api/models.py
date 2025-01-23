@@ -56,8 +56,8 @@ class StaffMember(BaseModel):
     unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
     unit_name: Annotated[str, Field(validation_alias="unitName")]
     staff_type: Annotated[StaffMemberType, Field(validation_alias="staffType")]
-    position_id: Annotated[UUID, Field(validation_alias="positionId")]
-    position_name: Annotated[str, Field(validation_alias="positionName")]
+    position_id: Annotated[UUID | None, Field(validation_alias="positionId")]
+    position_name: Annotated[str | None, Field(validation_alias="positionName")]
     status: StaffMemberStatus
     dismissed_on: Annotated[str | None, Field(validation_alias="dismissedOn")]
 
