@@ -41,11 +41,11 @@ class DashboardSpreadsheetGateway:
                 unit_data.active_couriers_count,
                 unit_data.dismissed_couriers_count,
                 unit_data.active_candidates_count,
-                unit_data.dismissed_candidates_count,
                 unit_data.new_specialists_count,
+                unit_data.dismissed_candidates_count,
                 unit_data.active_interns_count,
-                unit_data.dismissed_interns_count,
                 unit_data.new_candidates_count,
+                unit_data.dismissed_interns_count,
             )
             for unit_data in units_data
         ]
