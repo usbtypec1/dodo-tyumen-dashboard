@@ -7,9 +7,13 @@ import httpx
 
 from domain.enums import StaffMemberStatus, StaffMemberType
 from infrastructure.dodo_is_api.http_client import DodoIsApiHttpClient
+from bootstrap.logger import create_logger
 
 
 __all__ = ("DodoIsApiConnection", "join_uuids_with_comma", "join_with_comma")
+
+
+logger = create_logger("dodo_is_api_connection")
 
 
 def join_uuids_with_comma(uuids: Iterable[UUID]) -> str:
@@ -37,7 +41,13 @@ class DodoIsApiConnection:
             "toDate": f"{to_date:%Y-%m-%d}",
             "units": join_uuids_with_comma(unit_uuids),
         }
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting monthly units sales", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received monthly units sales",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
 
     def get_unit_monthly_goals(
         self,
@@ -52,7 +62,13 @@ class DodoIsApiConnection:
             "month": month,
             "unit": unit_uuid.hex,
         }
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting unit monthly goals", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received unit monthly goals",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
 
     def get_delivery_statistics(
         self,
@@ -67,7 +83,13 @@ class DodoIsApiConnection:
             "to": f"{to_date:%Y-%m-%d %H:%M:%S}",
             "units": join_uuids_with_comma(unit_uuids),
         }
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting delivery statistics", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received delivery statistics",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
 
     def get_production_productivity(
         self,
@@ -82,7 +104,13 @@ class DodoIsApiConnection:
             "to": f"{to_date:%Y-%m-%d %H:%M:%S}",
             "units": join_uuids_with_comma(unit_uuids),
         }
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting production productivity", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received production productivity",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
 
     def get_staff_members(
         self,
@@ -111,7 +139,13 @@ class DodoIsApiConnection:
             query_params["dismissedFrom"] = f"{dismissed_from_date:%Y-%m-%d}"
         if dismissed_to_date is not None:
             query_params["dismissedTo"] = f"{dismissed_to_date:%Y-%m-%d}"
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting staff members", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received staff members",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
 
     def get_staff_positions_history(
         self,
@@ -144,4 +178,10 @@ class DodoIsApiConnection:
         if skip is not None:
             query_params["skip"] = skip
 
-        return self.http_client.get(url, params=query_params)
+        logger.debug("Requesting staff positions history", extra=query_params)
+        response = self.http_client.get(url, params=query_params)
+        logger.debug(
+            "Received staff positions history",
+            extra=query_params | {"status_code": response.status_code},
+        )
+        return response
