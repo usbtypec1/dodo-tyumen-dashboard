@@ -36,14 +36,16 @@ CANDIDATES = (
 MANAGERS = (
     UUID("09b059ae5fceac4211eb7bf91936faa5"),
 )
-
+SKIPPED = (
+    UUID('09b059ae5fceac4211eb7bf9193701a7'),
+)
 
 class StaffMember(Protocol):
     unit_uuid: UUID
     status: StaffMemberStatus
     staff_type: StaffMemberType
-    position_id: UUID
-    position_name: str
+    position_id: UUID | None
+    position_name: str | None
 
 
 def group_by_unit_uuid(
@@ -69,7 +71,11 @@ def compute_staff_count_by_position(
         interns_count: int = 0
 
         for staff_member in unit_staff_members:
-            if staff_member.position_id in MANAGERS:
+            if staff_member.position_id is None:
+                continue
+            elif staff_member.position_id in SKIPPED:
+                continue
+            elif staff_member.position_id in MANAGERS:
                 managers_count += 1
             elif staff_member.position_id in GENERAL:
                 kitchen_members_count += 1
