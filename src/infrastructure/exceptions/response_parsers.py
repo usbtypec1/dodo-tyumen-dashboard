@@ -13,7 +13,9 @@ class ResponseStatusCodeError(Exception):
     """Raised when the response status code is not successful."""
 
     def __init__(self, response: httpx.Response) -> None:
-        super().__init__(f"Response status code is not successful: {response.status_code} - {response.text}")
+        super().__init__(
+            f"Response status code is not successful: {response.status_code} - {response.text}"
+        )
         self.response = response
 
 

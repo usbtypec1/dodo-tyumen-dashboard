@@ -168,9 +168,7 @@ class DodoIsApiConnection:
         query_params = {}
 
         if staff_member_ids is not None:
-            query_params["staffMembers"] = join_uuids_with_comma(
-                staff_member_ids
-            )
+            query_params["staffMembers"] = join_uuids_with_comma(staff_member_ids)
         if unit_ids is not None:
             query_params["units"] = join_uuids_with_comma(unit_ids)
         if take is not None:

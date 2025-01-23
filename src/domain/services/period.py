@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pendulum
 
 
-__all__ = ("Period", "get_weeks_of_month", "get_week_period")
+__all__ = ("Period", "get_week_period", "get_weeks_count_of_month")
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -62,9 +62,7 @@ def get_week_period(
     if not (1 <= week <= 5):
         raise ValueError(f"Invalid week: {week}. Week must be between 1 and 5.")
 
-    start_of_month = pendulum.datetime(
-        year=year, month=month, day=1, tz=timezone
-    )
+    start_of_month = pendulum.datetime(year=year, month=month, day=1, tz=timezone)
     end_of_month = start_of_month.end_of("month")
 
     from_day = (week - 1) * 7 + 1

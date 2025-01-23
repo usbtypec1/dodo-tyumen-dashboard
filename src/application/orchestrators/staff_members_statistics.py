@@ -18,9 +18,7 @@ class StaffMembersStatisticsOrchestrator:
     year: int
     week: int
     active_staff_members_fetch_interactor: ActiveStaffMembersFetchInteractor
-    dismissed_staff_members_fetch_interactor: (
-        DismissedStaffMembersFetchInteractor
-    )
+    dismissed_staff_members_fetch_interactor: DismissedStaffMembersFetchInteractor
 
     def execute(self) -> list[UnitWeeklyStaffData]:
         active_staff_members_count_by_position = (
@@ -36,13 +34,11 @@ class StaffMembersStatisticsOrchestrator:
         unit_uuid_to_dismissed_staff_members = map_unit_uuid_to_item(
             dismissed_staff_members_count_by_position
         )
-        
+
         units_weekly_staff_data: list[UnitWeeklyStaffData] = []
 
         for unit in self.units:
-            active_staff_members = unit_uuid_to_active_staff_memebrs.get(
-                unit.uuid
-            )
+            active_staff_members = unit_uuid_to_active_staff_memebrs.get(unit.uuid)
             dismissed_staff_members = unit_uuid_to_dismissed_staff_members.get(
                 unit.uuid
             )
@@ -68,18 +64,12 @@ class StaffMembersStatisticsOrchestrator:
             dismissed_interns_count: int = 0
 
             if dismissed_staff_members is not None:
-                dismissed_managers_count = (
-                    dismissed_staff_members.managers_count
-                )
+                dismissed_managers_count = dismissed_staff_members.managers_count
                 dismissed_kitchen_members_count = (
                     dismissed_staff_members.kitchen_members_count
                 )
-                dismissed_couriers_count = (
-                    dismissed_staff_members.couriers_count
-                )
-                dismissed_candidates_count = (
-                    dismissed_staff_members.candidates_count
-                )
+                dismissed_couriers_count = dismissed_staff_members.couriers_count
+                dismissed_candidates_count = dismissed_staff_members.candidates_count
                 dismissed_interns_count = dismissed_staff_members.interns_count
 
             unit_weekly_staff_data = UnitWeeklyStaffData(
@@ -101,5 +91,5 @@ class StaffMembersStatisticsOrchestrator:
                 new_specialists_count=0,
             )
             units_weekly_staff_data.append(unit_weekly_staff_data)
-        
+
         return units_weekly_staff_data

@@ -28,15 +28,13 @@ class ProductivityStatisticsForMonthFetchInteractor:
             year=self.year,
             timezone=self.timezone,
         ).rounded_to_upper_hour()
-        
+
         response = self.dodo_is_api_connection.get_production_productivity(
             from_date=period.from_date,
             to_date=period.to_date,
             unit_uuids=self.unit_uuids,
         )
-        units_productivity_statistics = parse_productivity_statistics_response(
-            response
-        )
+        units_productivity_statistics = parse_productivity_statistics_response(response)
         return [
             UnitProductivityStatistics(
                 unit_uuid=unit_productivity_statistics.unit_uuid,

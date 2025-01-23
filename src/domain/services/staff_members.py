@@ -33,12 +33,9 @@ CANDIDATES = (
     UUID("09b059ae5fceac4211eb7bf91936fe34"),
     UUID("09b059ae5fceac4211eb7bf91936f45a"),
 )
-MANAGERS = (
-    UUID("09b059ae5fceac4211eb7bf91936faa5"),
-)
-SKIPPED = (
-    UUID('09b059ae5fceac4211eb7bf9193701a7'),
-)
+MANAGERS = (UUID("09b059ae5fceac4211eb7bf91936faa5"),)
+SKIPPED = (UUID("09b059ae5fceac4211eb7bf9193701a7"),)
+
 
 class StaffMember(Protocol):
     unit_uuid: UUID

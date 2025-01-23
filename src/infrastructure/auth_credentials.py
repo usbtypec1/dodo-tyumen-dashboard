@@ -5,12 +5,11 @@ __all__ = ("AuthCredentialsGateway",)
 
 
 class AuthCredentialsGateway:
-    
     __slots__ = (
         "__spreadsheet",
         "__credentials_sheet",
     )
-    
+
     def __init__(
         self,
         *,
@@ -22,6 +21,6 @@ class AuthCredentialsGateway:
         self.__credentials_sheet = self.__spreadsheet.get_worksheet_by_id(
             credentials_sheet_id
         )
-    
+
     def get_access_token(self) -> str:
-        return self.__credentials_sheet.get('A2')[0][0]
+        return self.__credentials_sheet.get("A2")[0][0]

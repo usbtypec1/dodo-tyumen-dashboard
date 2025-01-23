@@ -34,12 +34,10 @@ class StaffPositionsHistoryFetchInteractor(DodoIsApiFetchInteractor):
             staff_members_ids_batches, start=1
         ):
             while True:
-                response = (
-                    self.dodo_is_api_connection.get_staff_positions_history(
-                        staff_member_ids=staff_member_ids_batch,
-                        take=take,
-                        skip=skip,
-                    )
+                response = self.dodo_is_api_connection.get_staff_positions_history(
+                    staff_member_ids=staff_member_ids_batch,
+                    take=take,
+                    skip=skip,
                 )
                 staff_positions_history_response = (
                     parse_staff_positions_history_response(response)

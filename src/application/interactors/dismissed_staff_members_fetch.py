@@ -27,12 +27,9 @@ class DismissedStaffMembersFetchInteractor:
     def execute(self) -> list[UnitStaffCountByPosition]:
         take: int = 1000
         skip: int = 0
-        
+
         period = get_week_period(
-            year=self.year,
-            month=self.month,
-            week=self.week,
-            timezone=self.timezone
+            year=self.year, month=self.month, week=self.week, timezone=self.timezone
         )
 
         staff_members: list[StaffMember] = []

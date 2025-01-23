@@ -59,14 +59,12 @@ class Config:
 def load_config_from_file(file_path: pathlib.Path = CONFIG_FILE_PATH) -> Config:
     config_text = file_path.read_text("utf-8")
     config = tomllib.loads(config_text)
-    
+
     timezone = pendulum.Timezone(config["app"]["timezone"])
     dashboard = DashboardConfig(
         spreadsheet_id=config["dashboard"]["spreadsheet"]["id"],
         staff_sheet_id=config["dashboard"]["spreadsheet"]["staff_sheet_id"],
-        economics_sheet_id=config["dashboard"]["spreadsheet"][
-            "economics_sheet_id"
-        ],
+        economics_sheet_id=config["dashboard"]["spreadsheet"]["economics_sheet_id"],
     )
     auth_credentials = AuthCredentialsConfig(
         spreadsheet_id=config["auth_credentials"]["spreadsheet"]["id"],

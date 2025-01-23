@@ -18,16 +18,12 @@ class DashboardSpreadsheetGateway:
         economics_sheet_id: int,
     ) -> None:
         self.__spreadsheet = service_account.open_by_key(spreadsheet_id)
-        self.__staff_sheet = self.__spreadsheet.get_worksheet_by_id(
-            staff_sheet_id
-        )
+        self.__staff_sheet = self.__spreadsheet.get_worksheet_by_id(staff_sheet_id)
         self.__economics_sheet = self.__spreadsheet.get_worksheet_by_id(
             economics_sheet_id
         )
 
-    def append_staff_data(
-        self, units_data: Iterable[UnitWeeklyStaffData]
-    ) -> None:
+    def append_staff_data(self, units_data: Iterable[UnitWeeklyStaffData]) -> None:
         rows = [
             (
                 unit_data.unit_name,

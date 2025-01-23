@@ -21,9 +21,7 @@ __all__ = (
 class UnitDeliveryStatistics(BaseModel):
     unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
     unit_name: Annotated[str, Field(validation_alias="unitName")]
-    delivery_orders_count: Annotated[
-        int, Field(validation_alias="deliveryOrdersCount")
-    ]
+    delivery_orders_count: Annotated[int, Field(validation_alias="deliveryOrdersCount")]
     couriers_shifts_duration: Annotated[
         int, Field(validation_alias="couriersShiftsDuration")
     ]
@@ -32,16 +30,12 @@ class UnitDeliveryStatistics(BaseModel):
 class UnitProductivityStatistics(BaseModel):
     unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
     unit_name: Annotated[str, Field(validation_alias="unitName")]
-    sales_per_labor_hour: Annotated[
-        float, Field(validation_alias="salesPerLaborHour")
-    ]
+    sales_per_labor_hour: Annotated[float, Field(validation_alias="salesPerLaborHour")]
 
 
 class UnitMonthlyGoals(BaseModel):
     sales_per_person: Annotated[float, Field(validation_alias="salesPerPerson")]
-    orders_per_courier: Annotated[
-        float, Field(validation_alias="ordersPerCourier")
-    ]
+    orders_per_courier: Annotated[float, Field(validation_alias="ordersPerCourier")]
 
 
 class UnitMonthlySales(BaseModel):
@@ -53,9 +47,7 @@ class StaffMember(BaseModel):
     id: str
     first_name: Annotated[str, Field(validation_alias="firstName")]
     last_name: Annotated[str, Field(validation_alias="lastName")]
-    patronymic_name: Annotated[
-        str | None, Field(validation_alias="patronymicName")
-    ]
+    patronymic_name: Annotated[str | None, Field(validation_alias="patronymicName")]
     unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
     unit_name: Annotated[str, Field(validation_alias="unitName")]
     staff_type: Annotated[StaffMemberType, Field(validation_alias="staffType")]
@@ -80,9 +72,7 @@ class StaffPositionsHistory(BaseModel):
     unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
     position_id: Annotated[UUID, Field(validation_alias="positionId")]
     position_name: Annotated[str, Field(validation_alias="positionName")]
-    take_position_on: Annotated[
-        datetime.date, Field(validation_alias="takePositionOn")
-    ]
+    take_position_on: Annotated[datetime.date, Field(validation_alias="takePositionOn")]
     leave_position_on: Annotated[
         datetime.date | None, Field(validation_alias="leavePositionOn")
     ]

@@ -60,9 +60,7 @@ class StorageGateway:
                 self.connection.execute(query)
                 self.connection.commit()
 
-    def add_units_staff_data(
-        self, units_data: Iterable[UnitWeeklyStaffData]
-    ) -> None:
+    def add_units_staff_data(self, units_data: Iterable[UnitWeeklyStaffData]) -> None:
         query = """
         INSERT INTO units_staff_data (
             unit_name,
@@ -140,7 +138,7 @@ class StorageGateway:
         self,
     ) -> list[UnitMonthlyEconomicsData]:
         query = """
-        SELECT 
+        SELECT
             unit_name,
             year,
             month,
@@ -173,7 +171,7 @@ class StorageGateway:
 
     def get_unuploaded_staff_data(self) -> list[UnitWeeklyStaffData]:
         query = """
-        SELECT 
+        SELECT
             unit_name,
             year,
             month,
