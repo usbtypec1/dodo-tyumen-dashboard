@@ -16,6 +16,7 @@ from infrastructure.dodo_is_api.models import (
     UnitProductivityStatistics,
     UnitMonthlyGoals,
     UnitMonthlySales,
+    StaffPositionsHistoryResponse,
 )
 
 
@@ -27,6 +28,7 @@ __all__ = (
     "parse_productivity_statistics_response",
     "parse_monthly_sales_response",
     "parse_staff_members_response",
+    "parse_staff_positions_history_response",
 )
 
 
@@ -219,5 +221,35 @@ def parse_staff_members_response(
 
     try:
         return StaffMembersResponse.model_validate(response_data)
+    except ValidationError as error:
+        raise ResponseDataParseError(response_data=response_data) from error
+
+
+def parse_staff_positions_history_response(
+    response: httpx.Response,
+) -> StaffPositionsHistoryResponse:
+    """
+    Parses the response for staff positions history.
+
+    Args:
+        response (httpx.Response): The HTTP response object.
+
+    Returns:
+        MembersResponse: Parsed staff positions history response object.
+
+    Raises:
+        ResponseStatusCodeError: If the response status code indicates failure.
+        ResponseJsonParseError: If the response JSON is invalid.
+        ResponseJsonInvalidTypeError: If the response data type is not valid.
+        ResponseDataParseError: If the expected data structure is missing or invalid.
+    """
+    ensure_status_code_success(response)
+
+    response_data: Any = parse_response_json(response)
+
+    response_data = ensure_response_data_is_dict(response_data)
+
+    try:
+        return StaffPositionsHistoryResponse.model_validate(response_data)
     except ValidationError as error:
         raise ResponseDataParseError(response_data=response_data) from error

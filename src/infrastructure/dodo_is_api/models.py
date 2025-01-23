@@ -1,3 +1,4 @@
+import datetime
 from uuid import UUID
 from typing import Annotated
 from pydantic import BaseModel, Field
@@ -12,6 +13,8 @@ __all__ = (
     "UnitMonthlySales",
     "StaffMember",
     "StaffMembersResponse",
+    "StaffPositionsHistory",
+    "StaffPositionsHistoryResponse",
 )
 
 
@@ -67,6 +70,27 @@ class StaffMembersResponse(BaseModel):
     skipped_count: Annotated[int, Field(validation_alias="skippedCount")]
     taken_count: Annotated[int, Field(validation_alias="takenCount")]
     total_count: Annotated[int, Field(validation_alias="totalCount")]
+    is_end_of_list_reached: Annotated[
+        bool, Field(validation_alias="isEndOfListReached")
+    ]
+
+
+class StaffPositionsHistory(BaseModel):
+    staff_id: Annotated[UUID, Field(validation_alias="staffId")]
+    unit_uuid: Annotated[UUID, Field(validation_alias="unitId")]
+    position_id: Annotated[UUID, Field(validation_alias="positionId")]
+    position_name: Annotated[str, Field(validation_alias="positionName")]
+    take_position_on: Annotated[
+        datetime.date, Field(validation_alias="takePositionOn")
+    ]
+    leave_position_on: Annotated[
+        datetime.date | None, Field(validation_alias="leavePositionOn")
+    ]
+    is_active: Annotated[bool, Field(validation_alias="isActive")]
+
+
+class StaffPositionsHistoryResponse(BaseModel):
+    history: list[StaffPositionsHistory]
     is_end_of_list_reached: Annotated[
         bool, Field(validation_alias="isEndOfListReached")
     ]
