@@ -178,3 +178,5 @@ config.toml
 credentials/*
 
 logging_config.json
+
+.DS_Store
