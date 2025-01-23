@@ -171,11 +171,76 @@ class StorageGateway:
             for unit_name, year, month, sales, delivery_orders_count, sales_per_person, orders_per_courier in rows
         ]
 
+    def get_unuploaded_staff_data(self) -> list[UnitWeeklyStaffData]:
+        query = """
+        SELECT 
+            unit_name,
+            year,
+            month,
+            week,
+            active_managers_count,
+            dismissed_managers_count,
+            active_kitchen_members_count,
+            dismissed_kitchen_members_count,
+            active_couriers_count,
+            dismissed_couriers_count,
+            active_candidates_count,
+            dismissed_candidates_count,
+            new_specialists_count,
+            active_interns_count,
+            dismissed_interns_count,
+            new_candidates_count
+        FROM units_staff_data
+        WHERE
+            uploaded_at IS NULL
+        ORDER BY year, month, week, unit_name;
+        """
+        cursor = self.connection.cursor()
+        with contextlib.closing(cursor):
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        return [
+            UnitWeeklyStaffData(
+                unit_name=unit_name,
+                year=year,
+                month=month,
+                week=week,
+                active_managers_count=active_managers_count,
+                dismissed_managers_count=dismissed_managers_count,
+                active_kitchen_members_count=active_kitchen_members_count,
+                dismissed_kitchen_members_count=dismissed_kitchen_members_count,
+                active_couriers_count=active_couriers_count,
+                dismissed_couriers_count=dismissed_couriers_count,
+                active_candidates_count=active_candidates_count,
+                dismissed_candidates_count=dismissed_candidates_count,
+                new_specialists_count=new_specialists_count,
+                active_interns_count=active_interns_count,
+                dismissed_interns_count=dismissed_interns_count,
+                new_candidates_count=new_candidates_count,
+            )
+            for unit_name, year, month, week, active_managers_count, dismissed_managers_count, active_kitchen_members_count, dismissed_kitchen_members_count, active_couriers_count, dismissed_couriers_count, active_candidates_count, dismissed_candidates_count, new_specialists_count, active_interns_count, dismissed_interns_count, new_candidates_count in rows
+        ]
+
     def mark_units_economics_data_as_uploaded(
         self, units_data: Iterable[UnitMonthlyEconomicsData]
     ) -> None:
         now = datetime.datetime.now(datetime.UTC).isoformat()
         query = "UPDATE units_economics_data SET uploaded_at = ? WHERE unit_name = ? AND year = ? AND month = ?;"
+        params = [
+            (now, unit_data.unit_name, unit_data.year, unit_data.month)
+            for unit_data in units_data
+        ]
+        with self.connection:
+            cursor = self.connection.cursor()
+            with contextlib.closing(cursor):
+                cursor.executemany(query, params)
+
+    def mark_units_staff_data_as_uploaded(
+        self,
+        units_data: Iterable[UnitWeeklyStaffData],
+    ) -> None:
+        now = datetime.datetime.now(datetime.UTC).isoformat()
+        query = "UPDATE units_staff_data SET uploaded_at = ? WHERE unit_name = ? AND year = ? AND month = ?;"
         params = [
             (now, unit_data.unit_name, unit_data.year, unit_data.month)
             for unit_data in units_data
