@@ -16,17 +16,16 @@ __all__ = (
     "AuthCredentialsConfig",
     "Config",
     "load_config_from_file",
+    "STORAGE_FILE_PATH",
+    "SRC_DIR",
 )
 
-
-CONFIG_FILE_PATH: Final[pathlib.Path] = (
-    pathlib.Path(__file__).parent.parent.parent / "config.toml"
-)
+SRC_DIR = pathlib.Path(__file__).parent.parent.parent
+CONFIG_FILE_PATH: Final[pathlib.Path] = SRC_DIR / "config.toml"
 GOOGLE_SHEETS_SERVICE_ACCOUNT_CREDENTIALS_FILE_PATH: Final[pathlib.Path] = (
-    pathlib.Path(__file__).parent.parent.parent
-    / "credentials"
-    / "google_sheets_service_account.json"
+    SRC_DIR / "credentials" / "google_sheets_service_account.json"
 )
+STORAGE_FILE_PATH: Final[pathlib.Path] = SRC_DIR / "database.db"
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
