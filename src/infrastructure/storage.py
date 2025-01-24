@@ -58,9 +58,8 @@ class StorageGateway:
         for query in queries:
             with self.connection:
                 self.connection.execute(query)
-                self.connection.commit()
 
-    def add_units_staff_data(self, units_data: Iterable[UnitWeeklyStaffData]) -> None:
+    def add_units_staff_data(self, units_data: Iterable[UnitWeeklyStaffData]) -> bool:
         query = """
         INSERT INTO units_staff_data (
             unit_name,
@@ -103,11 +102,15 @@ class StorageGateway:
             for unit_data in units_data
         ]
         with self.connection:
-            self.connection.executemany(query, rows)
+            try:
+                self.connection.executemany(query, rows)
+            except sqlite3.IntegrityError:
+                return False
+        return True
 
     def add_units_economics_data(
         self, units_data: Iterable[UnitMonthlyEconomicsData]
-    ) -> None:
+    ) -> bool:
         query = """
         INSERT INTO units_economics_data (
             unit_name,
@@ -132,7 +135,11 @@ class StorageGateway:
             for unit_data in units_data
         ]
         with self.connection:
-            self.connection.executemany(query, rows)
+            try:
+                self.connection.executemany(query, rows)
+            except sqlite3.IntegrityError:
+                return False
+        return True
 
     def get_unuploaded_units_economics_data(
         self,
