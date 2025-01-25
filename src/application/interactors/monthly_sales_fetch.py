@@ -1,7 +1,8 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 from uuid import UUID
-from zoneinfo import ZoneInfo
+
+import pendulum
 
 from infrastructure.dodo_is_api.connection import DodoIsApiConnection
 from domain.services.period import Period
@@ -19,7 +20,7 @@ class MonthlySalesFetchInteractor:
     dodo_is_api_connection: DodoIsApiConnection
     month: int
     year: int
-    timezone: ZoneInfo
+    timezone: pendulum.Timezone
     unit_uuids: Iterable[UUID]
 
     def execute(self):
