@@ -2,6 +2,9 @@ import argparse
 
 from fast_depends import inject
 
+from application.interactors.staff_positions_history_fetch import (
+    StaffPositionsHistoryFetchInteractor,
+)
 from infrastructure.dependencies.config import ConfigDependency
 from infrastructure.dependencies.dodo_is_api import (
     DodoIsApiConnectionDependency,
@@ -74,6 +77,9 @@ def main(
         timezone=config.timezone,
         unit_uuids=unit_uuids,
     )
+    staff_positions_history_fetch_interactor = StaffPositionsHistoryFetchInteractor(
+        dodo_is_api_connection=dodo_is_api_connection,
+    )
     staff_members_statistics_orchestrator = StaffMembersStatisticsOrchestrator(
         units=config.units,
         year=year,
@@ -81,6 +87,7 @@ def main(
         week=week,
         active_staff_members_fetch_interactor=active_staff_members_fetch_interactor,
         dismissed_staff_members_fetch_interactor=dismissed_staff_members_fetch_interactor,
+        staff_positions_history_fetch_interactor=staff_positions_history_fetch_interactor,
     )
     units_weekly_staff_data = staff_members_statistics_orchestrator.execute()
 

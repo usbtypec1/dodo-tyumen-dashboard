@@ -44,7 +44,7 @@ class UnitMonthlySales(BaseModel):
 
 
 class StaffMember(BaseModel):
-    id: str
+    id: UUID
     first_name: Annotated[str, Field(validation_alias="firstName")]
     last_name: Annotated[str, Field(validation_alias="lastName")]
     patronymic_name: Annotated[str | None, Field(validation_alias="patronymicName")]

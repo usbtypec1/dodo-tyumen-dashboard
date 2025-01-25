@@ -19,14 +19,12 @@ logger = create_logger("fetch_interactors")
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class StaffPositionsHistoryFetchInteractor(DodoIsApiFetchInteractor):
-    staff_member_ids: Iterable[UUID]
-
-    def execute(self) -> list[StaffPositionsHistory]:
+    def execute(self, staff_member_ids: Iterable[UUID]) -> list[StaffPositionsHistory]:
         take: int = 1000
         skip: int = 0
 
         batch_size: int = 30
-        staff_members_ids_batches = batched(self.staff_member_ids, n=batch_size)
+        staff_members_ids_batches = batched(staff_member_ids, n=batch_size)
 
         history: list[StaffPositionsHistory] = []
 
