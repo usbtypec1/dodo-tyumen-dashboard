@@ -122,6 +122,8 @@ class DodoIsApiConnection:
         staff_types: Iterable[StaffMemberType] | None = None,
         dismissed_from_date: datetime.datetime | None = None,
         dismissed_to_date: datetime.datetime | None = None,
+        hired_from_date: datetime.datetime | None = None,
+        hired_to_date: datetime.datetime | None = None,
     ) -> httpx.Response:
         url = "/staff/members"
         query_params = {}
@@ -139,6 +141,11 @@ class DodoIsApiConnection:
             query_params["dismissedFrom"] = f"{dismissed_from_date:%Y-%m-%d}"
         if dismissed_to_date is not None:
             query_params["dismissedTo"] = f"{dismissed_to_date:%Y-%m-%d}"
+        if hired_from_date is not None:
+            query_params["hiredFrom"] = f"{hired_from_date:%Y-%m-%d}"
+        if hired_to_date is not None:
+            query_params["hiredTo"] = f"{hired_to_date:%Y-%m-%d}"
+
         logger.debug("Requesting staff members", extra=query_params)
         response = self.http_client.get(url, params=query_params)
         logger.debug(
