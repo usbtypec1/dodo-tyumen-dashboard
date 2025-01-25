@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from collections import defaultdict
 from uuid import UUID
 from typing import Protocol
@@ -20,7 +20,7 @@ COURIERS = (
     UUID("09b059ae5fceac4211eb7bf91937050e"),
     UUID("09b059ae5fceac4211eb7bf9193705f1"),
 )
-GENERAL = (
+SPECIALIST = (
     UUID("000d3abf84c3bb2e11ebfc11012115db"),
     UUID("09b059ae5fceac4211eb7bf91936fd47"),
     UUID("09b059ae5fceac4211eb7bf91936f57c"),
@@ -38,6 +38,7 @@ SKIPPED = (UUID("09b059ae5fceac4211eb7bf9193701a7"),)
 
 
 class StaffMember(Protocol):
+    id: UUID
     unit_uuid: UUID
     status: StaffMemberStatus
     staff_type: StaffMemberType
@@ -56,6 +57,7 @@ def group_by_unit_uuid(
 
 def compute_staff_count_by_position(
     staff_members: Iterable[StaffMember],
+    staff_id_to_position_ids: Mapping[UUID, list[UUID]],
 ) -> list[UnitStaffCountByPosition]:
     units_staff_count_by_position: list[UnitStaffCountByPosition] = []
 
@@ -68,18 +70,25 @@ def compute_staff_count_by_position(
         interns_count: int = 0
 
         for staff_member in unit_staff_members:
+            staff_position_ids_history = staff_id_to_position_ids.get(
+                staff_member.id, []
+            )
+
             if staff_member.position_id is None:
                 continue
             elif staff_member.position_id in SKIPPED:
                 continue
             elif staff_member.position_id in MANAGERS:
                 managers_count += 1
-            elif staff_member.position_id in GENERAL:
+            elif staff_member.position_id in SPECIALIST:
                 kitchen_members_count += 1
             elif staff_member.position_id in COURIERS:
                 couriers_count += 1
             elif staff_member.position_id in CANDIDATES:
-                candidates_count += 1
+                if staff_member.position_id in staff_position_ids_history:
+                    kitchen_members_count += 1
+                else:
+                    candidates_count += 1
             elif staff_member.position_id in INTERNS:
                 interns_count += 1
             else:
@@ -96,3 +105,27 @@ def compute_staff_count_by_position(
         units_staff_count_by_position.append(unit_staff_count_by_position)
 
     return units_staff_count_by_position
+
+
+class HasStaffIdAndPositionId(Protocol):
+    staff_id: UUID
+    position_id: UUID | None
+
+
+def get_staff_member_ids_who_was_specialist(
+    staff_positions_history: Iterable[HasStaffIdAndPositionId],
+) -> set[UUID]:
+    """
+    Get the IDs of staff members who were specialists.
+
+    Args:
+        An iterable of staff position history records.
+
+    Returns:
+        A set of UUIDs of staff members who were specialists.
+    """
+    return {
+        staff_position.staff_id
+        for staff_position in staff_positions_history
+        if staff_position.position_id in SPECIALIST
+    }
