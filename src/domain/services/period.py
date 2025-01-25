@@ -3,7 +3,12 @@ from dataclasses import dataclass
 import pendulum
 
 
-__all__ = ("Period", "get_week_period", "get_weeks_count_of_month")
+__all__ = (
+    "Period",
+    "get_week_period",
+    "get_weeks_count_of_month",
+    "get_current_week_number",
+)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -35,6 +40,20 @@ class Period:
             from_date=self.from_date,
             to_date=self.to_date.add(hours=1).start_of("hour"),
         )
+
+
+def get_current_week_number(timezone: pendulum.Timezone) -> int:
+    """
+    Returns the week number of the current week.
+
+    Args:
+        timezone (pendulum.Timezone): The timezone to consider.
+
+    Returns:
+        int: The week number of the current week.
+    """
+    now = pendulum.now(timezone)
+    return (now.day - 1) // 7 + 1
 
 
 def get_week_period(

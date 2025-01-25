@@ -1,120 +1,91 @@
-import sqlite3
+import argparse
 
-import gspread
+from fast_depends import inject
 
-from infrastructure.storage import StorageGateway
-from application.interactors.monthly_sales_fetch import (
-    MonthlySalesFetchInteractor,
+from infrastructure.dependencies.config import ConfigDependency
+from infrastructure.dependencies.dodo_is_api import (
+    DodoIsApiConnectionDependency,
 )
-from domain.services.period import Period
-from bootstrap.config import (
-    GOOGLE_SHEETS_SERVICE_ACCOUNT_CREDENTIALS_FILE_PATH,
-    load_config_from_file,
+from infrastructure.dependencies.storage import StorageGatewayDependency
+from domain.services.period import Period, get_current_week_number
+from application.interactors.active_staff_members_fetch import (
+    ActiveStaffMembersFetchInteractor,
+)
+from application.interactors.dismissed_staff_members_fetch import (
+    DismissedStaffMembersFetchInteractor,
+)
+from application.orchestrators.staff_members_statistics import (
+    StaffMembersStatisticsOrchestrator,
 )
 from domain.services.units import to_uuids
-from infrastructure.auth_credentials import AuthCredentialsGateway
-from infrastructure.dodo_is_api.connection import DodoIsApiConnection
-from infrastructure.dodo_is_api.http_client import (
-    closing_dodo_is_api_http_client,
-)
-from application.orchestrators.economics_statistics import (
-    EconomicsStatisticsOrchestrator,
-)
-from application.interactors.delivery_statistics_fetch import (
-    DeliveryStatisticsForMonthFetchInteractor,
-)
-from application.interactors.productivity_statistics_fetch import (
-    ProductivityStatisticsForMonthFetchInteractor,
-)
-from application.interactors.unit_monthly_goals_fetch import (
-    UnitMonthlyGoalsFetchInteractor,
-)
-from domain.services.period import get_weeks_of_month
 
 
-def main():
-    config = load_config_from_file()
-    
-    for week, period in enumerate(get_weeks_of_month(year=2024, month=12, timezone=config.timezone), start=1):
-        print(period)
-    
-    return
-
-    service_account = gspread.service_account(  # type: ignore[reportPrivateImportUsage]
-        GOOGLE_SHEETS_SERVICE_ACCOUNT_CREDENTIALS_FILE_PATH
+@inject
+def main(
+    config: ConfigDependency,
+    dodo_is_api_connection: DodoIsApiConnectionDependency,
+    storage_gateway: StorageGatewayDependency,
+):
+    argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument(
+        "--year",
+        type=int,
+        required=False,
     )
-    auth_credentials_gateway = AuthCredentialsGateway(
-        service_account=service_account,
-        spreadsheet_id=config.auth_credentials.spreadsheet_id,
-        credentials_sheet_id=config.auth_credentials.sheet_id,
+    argument_parser.add_argument(
+        "--month",
+        type=int,
+        required=False,
     )
-    access_token = auth_credentials_gateway.get_access_token()
+    argument_parser.add_argument(
+        "--week",
+        type=int,
+        required=False,
+    )
+    args = argument_parser.parse_args()
 
     period = Period.current_month(config.timezone)
-    
-    year = period.from_date.year
-    month = period.from_date.month
+
+    year: int | None = args.year
+    month: int | None = args.month
+    week: int | None = args.week
+
+    if year is None:
+        year = period.from_date.year
+    if month is None:
+        month = period.from_date.month
+    if week is None:
+        week = get_current_week_number(config.timezone)
 
     unit_uuids = to_uuids(config.units)
+    active_staff_members_fetch_interactor = ActiveStaffMembersFetchInteractor(
+        dodo_is_api_connection=dodo_is_api_connection,
+        unit_uuids=unit_uuids,
+        year=year,
+        month=month,
+        week=week,
+        timezone=config.timezone,
+    )
+    dismissed_staff_members_fetch_interactor = DismissedStaffMembersFetchInteractor(
+        dodo_is_api_connection=dodo_is_api_connection,
+        year=year,
+        month=month,
+        week=week,
+        timezone=config.timezone,
+        unit_uuids=unit_uuids,
+    )
+    staff_members_statistics_orchestrator = StaffMembersStatisticsOrchestrator(
+        units=config.units,
+        year=year,
+        month=month,
+        week=week,
+        active_staff_members_fetch_interactor=active_staff_members_fetch_interactor,
+        dismissed_staff_members_fetch_interactor=dismissed_staff_members_fetch_interactor,
+    )
+    units_weekly_staff_data = staff_members_statistics_orchestrator.execute()
 
-    with closing_dodo_is_api_http_client(
-        base_url=config.dodo_is_api.base_url,
-        access_token=access_token,
-    ) as http_client:
-        connection = DodoIsApiConnection(http_client=http_client)
-
-        delivery_statistics_fetch_interactor = (
-            DeliveryStatisticsForMonthFetchInteractor(
-                dodo_is_api_connection=connection,
-                month=month,
-                year=year,
-                timezone=config.timezone,
-                unit_uuids=unit_uuids,
-            )
-        )
-        producitivty_statistics_fetch_interactor = (
-            ProductivityStatisticsForMonthFetchInteractor(
-                dodo_is_api_connection=connection,
-                month=month,
-                year=year,
-                timezone=config.timezone,
-                unit_uuids=unit_uuids,
-            )
-        )
-        unit_monthly_goals_fetch_interactors = [
-            UnitMonthlyGoalsFetchInteractor(
-                dodo_is_api_connection=connection,
-                month=month,
-                year=year,
-                unit_uuid=unit_uuid,
-            )
-            for unit_uuid in unit_uuids
-        ]
-        monthly_sales_fetch_interactor = MonthlySalesFetchInteractor(
-            dodo_is_api_connection=connection,
-            month=month,
-            year=year,
-            timezone=config.timezone,
-            unit_uuids=unit_uuids,
-        )
-
-        economics_statistics_orchestrator = EconomicsStatisticsOrchestrator(
-            units=config.units,
-            year=year,
-            month=month,
-            delivery_statistics_fetch_interactor=delivery_statistics_fetch_interactor,
-            produciton_statistics_fetch_interactor=producitivty_statistics_fetch_interactor,
-            unit_monthly_goals_fetch_intetactors=unit_monthly_goals_fetch_interactors,
-            monthly_sales_fetch_interactor=monthly_sales_fetch_interactor,
-        )
-        units_monthly_economics_data = (
-            economics_statistics_orchestrator.execute()
-        )
-
-    with sqlite3.connect("./database.db") as connection:
-        storage_gateway = StorageGateway(connection=connection)
-        storage_gateway.add_units_economics_data(units_monthly_economics_data)
+    storage_gateway.add_units_staff_data(units_weekly_staff_data)
 
 
 if __name__ == "__main__":
-    main()
+    main()  # type: ignore[reportCallIssue]
