@@ -4,9 +4,7 @@ from uuid import UUID
 
 import pendulum
 
-from domain.entities import UnitStaffCountByPosition
 from domain.enums import StaffMemberStatus
-from domain.services.staff_members import compute_staff_count_by_position
 from infrastructure.dodo_is_api.models import StaffMember
 from infrastructure.dodo_is_api.response_parsers import (
     parse_staff_members_response,
@@ -26,7 +24,7 @@ class ActiveStaffMembersFetchInteractor(DodoIsApiFetchInteractor):
     week: int
     timezone: pendulum.Timezone
 
-    def execute(self) -> list[UnitStaffCountByPosition]:
+    def execute(self) -> list[StaffMember]:
         take: int = 1000
         skip: int = 0
 
@@ -56,4 +54,4 @@ class ActiveStaffMembersFetchInteractor(DodoIsApiFetchInteractor):
 
             skip += take
 
-        return compute_staff_count_by_position(staff_members)
+        return staff_members
