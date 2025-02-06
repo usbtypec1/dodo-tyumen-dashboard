@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from collections import defaultdict
 from dataclasses import dataclass
 from uuid import UUID
-from typing import Protocol
+from typing import Protocol, TypeVar
 
 from domain.enums import StaffMemberStatus, StaffMemberType
 from domain.services.common import HasUnitUuidT
@@ -238,3 +238,14 @@ def merge_active_and_dismissed_staff_members_count(
         )
 
     return units_weekly_staff_data
+
+
+class HasTakePositionOnAndLeavePositionOn(Protocol):
+    take_position_on: str
+    leave_position_on: str | None
+
+
+HasTakePositionOnAndLeavePositionOnT = TypeVar(
+    "HasTakePositionOnAndLeavePositionOnT",
+    bound=HasTakePositionOnAndLeavePositionOn,
+)

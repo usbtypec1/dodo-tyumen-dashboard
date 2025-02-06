@@ -5,10 +5,9 @@ import pendulum
 
 __all__ = (
     "Period",
-    "get_week_period",
-    "get_weeks_count_of_month",
     "get_current_week_number",
     "get_current_week_number_of_year",
+    "get_month_number_by_week_number_of_year",
 )
 
 
@@ -71,66 +70,55 @@ def get_current_week_number_of_year(timezone: pendulum.Timezone) -> int:
     return now.week_of_year
 
 
-def get_week_period(
-    *,
-    year: int,
-    month: int,
-    week: int,
-    timezone: pendulum.Timezone,
+def get_period_by_week_number_of_year(
+    week_number: int, year: int, timezone: pendulum.Timezone
 ) -> Period:
     """
-    Returns the period corresponding to a specific week of the current month.
+    Returns the period corresponding to a specific week of the year.
 
     Args:
+        week_number (int): The week number (1-53).
         year (int): The year number.
-        month (int): The month number (1-12).
-        week (int): The week number (1-5).
         timezone (pendulum.Timezone): The timezone to consider.
 
     Returns:
         Period: The period representing the specified week.
 
     Raises:
-        ValueError: If the week number is not valid (e.g., greater than 5 or less than 1).
+        ValueError: If the week number is not valid (e.g., greater than 53 or less than 1).
     """
-    if not (1 <= week <= 5):
-        raise ValueError(f"Invalid week: {week}. Week must be between 1 and 5.")
+    if not (1 <= week_number <= 53):
+        raise ValueError(
+            f"Invalid week number: {week_number}. Week number must be between 1 and 53."
+        )
 
-    start_of_month = pendulum.datetime(year=year, month=month, day=1, tz=timezone)
-    end_of_month = start_of_month.end_of("month")
-
-    from_day = (week - 1) * 7 + 1
-    from_date = start_of_month.add(days=from_day - 1).start_of("day")
-
-    has_last_week_of_month_fewer_than_7_days = (
-        week == 5 or from_date.add(days=6) > end_of_month
-    )
-    if has_last_week_of_month_fewer_than_7_days:
-        to_date = end_of_month
-    else:
-        to_date = from_date.add(days=6).end_of("day")
+    start_of_year = pendulum.datetime(year=year, month=1, day=1, tz=timezone)
+    from_date = start_of_year.add(weeks=week_number - 1).start_of("week")
+    to_date = from_date.end_of("week")
 
     return Period(from_date=from_date, to_date=to_date)
 
 
-def get_weeks_count_of_month(*, year: int, month: int) -> int:
+def get_month_number_by_week_number_of_year(week_number: int, year: int):
     """
-    Returns the number of weeks in the specified month.
+    Returns the month number corresponding to a specific week of the year.
 
     Args:
+        week_number (int): The week number (1-53).
         year (int): The year number.
-        month (int): The month number (1-12).
 
     Returns:
-        int: The number of weeks in the specified month.
+        int: The month number of the specified week.
+
+    Raises:
+        ValueError: If the week number is not valid (e.g., greater than 53 or less than 1).
     """
-    start_of_month = pendulum.datetime(year=year, month=month, day=1)
-    end_of_month = start_of_month.end_of("month")
+    if not (1 <= week_number <= 53):
+        raise ValueError(
+            f"Invalid week number: {week_number}. Week number must be between 1 and 53."
+        )
 
-    weeks_count = 0
-    current_date = start_of_month
-    while current_date <= end_of_month:
-        weeks_count += 1
-        current_date = current_date.add(weeks=1)
+    start_of_year = pendulum.datetime(year=year, month=1, day=1)
+    week_start = start_of_year.add(weeks=week_number - 1).start_of("week")
 
-    return weeks_count
+    return week_start.month

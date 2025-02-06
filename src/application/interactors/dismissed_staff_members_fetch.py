@@ -5,7 +5,7 @@ from uuid import UUID
 import pendulum
 
 from domain.enums import StaffMemberStatus
-from domain.services.period import get_week_period
+from domain.services.period import get_period_by_week_number_of_year
 from infrastructure.dodo_is_api.connection import DodoIsApiConnection
 from infrastructure.dodo_is_api.models import StaffMember
 from infrastructure.dodo_is_api.response_parsers import (
@@ -17,7 +17,6 @@ from infrastructure.dodo_is_api.response_parsers import (
 class DismissedStaffMembersFetchInteractor:
     dodo_is_api_connection: DodoIsApiConnection
     year: int
-    month: int
     week: int
     timezone: pendulum.Timezone
     unit_uuids: Iterable[UUID]
@@ -26,10 +25,9 @@ class DismissedStaffMembersFetchInteractor:
         take: int = 1000
         skip: int = 0
 
-        period = get_week_period(
+        period = get_period_by_week_number_of_year(
             year=self.year,
-            month=self.month,
-            week=self.week,
+            week_number=self.week,
             timezone=self.timezone,
         )
 

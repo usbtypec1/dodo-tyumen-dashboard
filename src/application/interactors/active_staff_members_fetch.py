@@ -9,7 +9,7 @@ from infrastructure.dodo_is_api.models import StaffMember
 from infrastructure.dodo_is_api.response_parsers import (
     parse_staff_members_response,
 )
-from domain.services.period import get_week_period
+from domain.services.period import get_period_by_week_number_of_year
 from application.interactors.dodo_is_api_fetch import DodoIsApiFetchInteractor
 
 
@@ -20,7 +20,6 @@ __all__ = ("ActiveStaffMembersFetchInteractor",)
 class ActiveStaffMembersFetchInteractor(DodoIsApiFetchInteractor):
     unit_uuids: Iterable[UUID]
     year: int
-    month: int
     week: int
     timezone: pendulum.Timezone
 
@@ -30,10 +29,9 @@ class ActiveStaffMembersFetchInteractor(DodoIsApiFetchInteractor):
 
         staff_members: list[StaffMember] = []
 
-        period = get_week_period(
+        period = get_period_by_week_number_of_year(
             year=self.year,
-            month=self.month,
-            week=self.week,
+            week_number=self.week,
             timezone=self.timezone,
         )
         hired_to_date = period.from_date
