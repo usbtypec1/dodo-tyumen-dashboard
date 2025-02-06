@@ -8,6 +8,7 @@ __all__ = (
     "get_week_period",
     "get_weeks_count_of_month",
     "get_current_week_number",
+    "get_current_week_number_of_year",
 )
 
 
@@ -54,6 +55,20 @@ def get_current_week_number(timezone: pendulum.Timezone) -> int:
     """
     now = pendulum.now(timezone)
     return (now.day - 1) // 7 + 1
+
+
+def get_current_week_number_of_year(timezone: pendulum.Timezone) -> int:
+    """
+    Returns the week number of the current week of the year.
+
+    Args:
+        timezone (pendulum.Timezone): The timezone to consider.
+
+    Returns:
+        int: The week number of the current week of the year.
+    """
+    now = pendulum.now(timezone)
+    return now.week_of_year
 
 
 def get_week_period(
